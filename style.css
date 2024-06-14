@@ -70,11 +70,7 @@ button:hover {
   background-color: red;
   position: absolute;
   right: 5px;
-  display: none;
+  display: inline-block;
   background-color: transparent;
   border: none;
-}
-/* on hover the message delete button will appear */
-.message:hover .delete-btn {
-  display: inline-block;
 }

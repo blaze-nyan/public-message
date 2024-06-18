@@ -67,10 +67,12 @@ button:hover {
   position: relative;
 }
 .delete-btn {
-  background-color: red;
   position: absolute;
   right: 5px;
   display: inline-block;
   background-color: transparent;
   border: none;
+}
+.delete-btn i {
+  color: rgb(228, 79, 79);
 }

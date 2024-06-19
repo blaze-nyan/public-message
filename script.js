@@ -2,20 +2,31 @@ const messageTextFieldEl = document.getElementById("message-text"); // this is t
 const publishBtnEl = document.getElementById("publish"); // this is button
 const messagesContainerEl = document.getElementById("messages");
 let key = 0;
+let isFav = false;
 const messagesArray = [];
+// { key: -1, textMessage: "yoo", isFav: true }
 
 publishBtnEl.addEventListener("click", deployNewmessage);
-
+render();
 //function for creating new messages
 function createNewmessage() {
   let newMessage = ``;
+  let favIconClass = "";
   for (let message of messagesArray) {
+    if (message.isFav) {
+      favIconClass = "fav-ed";
+    } else {
+      favIconClass = "";
+    }
     newMessage += `
-      <div class="message" id=${message.key}>
-        <span>${message.textMessage} </span>
-        <button class="delete-btn" data-message=${message.key}>
-          <i class="fa-solid fa-trash-can" data-message=${message.key}></i>
-        </button>
+      <div class="message-content">
+        <button class="fav-button ${favIconClass}" id="fav-button" data-fav=${message.key}><i class="fa-solid fa-star" data-fav=${message.key}></i></button>
+        <div class="message" id=${message.key}>
+          <span>${message.textMessage} </span>
+          <button class="delete-btn" data-message=${message.key}>
+            <i class="fa-solid fa-trash-can" data-message=${message.key}></i>
+          </button>
+        </div>
       </div>`;
   }
   return newMessage;
@@ -26,11 +37,8 @@ function deployNewmessage() {
   let userMessage = messageTextFieldEl.value;
   textMessage = userMessage.trim();
   if (textMessage !== "") {
-    console.log(textMessage);
     resetText(messageTextFieldEl); //getting value from textarea
-    // checking whether textfiled is empty or not
-
-    messagesArray.push({ key, textMessage });
+    messagesArray.push({ key, textMessage, isFav });
     key++;
     render();
   } else {
@@ -60,18 +68,35 @@ messageTextFieldEl.addEventListener("keydown", function (event) {
   }
 });
 
-//testing
+//adding event listener
 
 document.addEventListener("click", function (e) {
-  let exactMessageIndex;
+  let targetId;
   if (e.target.dataset.message) {
-    messagesArray.forEach(function (message) {
-      if (e.target.dataset.message == message.key) {
-        exactMessageIndex = messagesArray.indexOf(message);
-        messagesArray.splice(exactMessageIndex, 1);
-        console.log(messagesArray);
-        render();
-      }
-    });
+    targetId = e.target.dataset.message;
+    handleDeleteButton(targetId);
+  } else if (e.target.dataset.fav) {
+    targetId = e.target.dataset.fav;
+    handleFavButton(targetId);
   }
 });
+
+// delete button
+function handleDeleteButton(targetKey) {
+  const targetMessage = messagesArray.filter(function (message) {
+    return targetKey == message.key;
+  })[0];
+  if (!targetMessage.isFav) {
+    let exactMessageIndex = messagesArray.indexOf(targetMessage);
+    messagesArray.splice(exactMessageIndex, 1);
+    render();
+  }
+}
+// fav button
+function handleFavButton(targetKey) {
+  const targetMessage = messagesArray.filter(function (message) {
+    return message.key == targetKey;
+  })[0];
+  targetMessage.isFav = !targetMessage.isFav;
+  render();
+}

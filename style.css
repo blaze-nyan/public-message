@@ -64,15 +64,41 @@ button:hover {
   padding: 15px;
   border-radius: 5px;
   margin-top: 10px;
-  position: relative;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
 }
+.message span {
+  word-wrap: break-word;
+  overflow-x: scroll;
+}
+
 .delete-btn {
-  position: absolute;
-  right: 5px;
-  display: inline-block;
+  margin: auto 0;
+  margin-left: auto;
+
   background-color: transparent;
   border: none;
 }
 .delete-btn i {
   color: rgb(228, 79, 79);
+  font-size: 16px;
+}
+.message-content {
+  display: flex;
+  flex-direction: row-reverse;
+  /* align-items: center; */
+}
+#fav-button {
+  margin: auto;
+  /* margin-top: 7px; */
+  background-color: transparent;
+  border: none;
+}
+.fav-button i {
+  color: rgb(151, 151, 151);
+  font-size: 14px;
+}
+.fav-ed i {
+  color: #289428;
 }

@@ -58,6 +58,9 @@ button:hover {
   border-top: 1px solid black;
   padding-top: 10px;
 }
+.message-container h3 {
+  display: inline-block;
+}
 .messages .message {
   text-align: left;
   background-color: white;
@@ -101,4 +104,17 @@ button:hover {
 }
 .fav-ed i {
   color: #289428;
+}
+
+.delete-all {
+  background-color: rgb(68, 11, 11);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-left: 20px;
+  transition: box-shadow 0.2s;
+}
+.delete-all:hover {
+  box-shadow: 0 0 8px #6f090e;
 }

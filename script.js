@@ -1,9 +1,10 @@
 const messageTextFieldEl = document.getElementById("message-text"); // this is text field
 const publishBtnEl = document.getElementById("publish"); // this is button
 const messagesContainerEl = document.getElementById("messages");
+const deleteAllBtnEl = document.getElementById("delete-all");
 let key = 0;
 let isFav = false;
-const messagesArray = [];
+let messagesArray = [];
 // { key: -1, textMessage: "yoo", isFav: true }
 
 publishBtnEl.addEventListener("click", deployNewmessage);
@@ -100,3 +101,17 @@ function handleFavButton(targetKey) {
   targetMessage.isFav = !targetMessage.isFav;
   render();
 }
+
+//delete all button
+
+deleteAllBtnEl.addEventListener("click", function () {
+  let targetMessages = messagesArray.filter(function (message) {
+    return message.isFav === false;
+  });
+  targetMessages.forEach(function (message) {
+    let targetIndex = messagesArray.indexOf(message);
+    messagesArray.splice(targetIndex, 1);
+  });
+  // console.log(targetMessages);
+  render();
+});

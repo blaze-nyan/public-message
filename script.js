@@ -9,7 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 const appSettings = {
   databaseURL:
-    "https://note-taker-8981b-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    //yourURL
 };
 
 const app = initializeApp(appSettings);

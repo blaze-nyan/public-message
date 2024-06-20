@@ -1,47 +1,80 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  remove,
+  update,
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+const appSettings = {
+  databaseURL:
+    "https://note-taker-8981b-default-rtdb.asia-southeast1.firebasedatabase.app/",
+};
+
+const app = initializeApp(appSettings);
+const database = getDatabase(app);
+const messagesInDB = ref(database, "messages");
+let newMessage = ``;
+let messagevalArray;
+onValue(messagesInDB, function (snapshot) {
+  newMessage = ``;
+  if (snapshot.val()) {
+    messagevalArray = Object.entries(snapshot.val());
+    messagesArray = messagevalArray;
+    messagevalArray.forEach(function (childSnapshot) {
+      const messageValues = childSnapshot;
+      let newMessage = messageValues[1];
+      let currentId = messageValues[0];
+      render(currentId, newMessage);
+    });
+  } else {
+    messagesContainerEl.innerHTML = "";
+  }
+});
+
 const messageTextFieldEl = document.getElementById("message-text"); // this is text field
 const publishBtnEl = document.getElementById("publish"); // this is button
 const messagesContainerEl = document.getElementById("messages");
 const deleteAllBtnEl = document.getElementById("delete-all");
 let key = 0;
 let isFav = false;
-let messagesArray = [];
-// { key: -1, textMessage: "yoo", isFav: true }
+let messagesArray;
 
 publishBtnEl.addEventListener("click", deployNewmessage);
-render();
+
 //function for creating new messages
-function createNewmessage() {
-  let newMessage = ``;
+
+function createNewmessage(currentId, message) {
   let favIconClass = "";
-  for (let message of messagesArray) {
-    if (message.isFav) {
-      favIconClass = "fav-ed";
-    } else {
-      favIconClass = "";
-    }
-    newMessage += `
+  if (message.isFav) {
+    favIconClass = "fav-ed";
+  } else {
+    favIconClass = "";
+  }
+  newMessage += `
       <div class="message-content">
-        <button class="fav-button ${favIconClass}" id="fav-button" data-fav=${message.key}><i class="fa-solid fa-star" data-fav=${message.key}></i></button>
-        <div class="message" id=${message.key}>
+        <button class="fav-button ${favIconClass}" id="fav-button" data-fav=${currentId}><i class="fa-solid fa-star" data-fav=${currentId}></i></button>
+        <div class="message" id=${currentId}>
           <span>${message.textMessage} </span>
-          <button class="delete-btn" data-message=${message.key}>
-            <i class="fa-solid fa-trash-can" data-message=${message.key}></i>
+          <button class="delete-btn" data-message=${currentId}>
+            <i class="fa-solid fa-trash-can" data-message=${currentId}></i>
           </button>
         </div>
       </div>`;
-  }
   return newMessage;
 }
 
 // new message deploy function
 function deployNewmessage() {
   let userMessage = messageTextFieldEl.value;
-  textMessage = userMessage.trim();
+  let textMessage = userMessage.trim();
+
   if (textMessage !== "") {
     resetText(messageTextFieldEl); //getting value from textarea
-    messagesArray.push({ key, textMessage, isFav });
+    let currentMessage = { key, textMessage, isFav };
+    push(messagesInDB, currentMessage);
     key++;
-    render();
   } else {
     resetText(messageTextFieldEl);
     alert("no message yet");
@@ -52,13 +85,9 @@ function resetText(element) {
   element.value = "";
 }
 
-function render() {
-  if (messagesArray[0]) {
-    messagesContainerEl.innerHTML = "";
-    messagesContainerEl.innerHTML = createNewmessage();
-  } else {
-    messagesContainerEl.innerHTML = "";
-  }
+function render(currentId, message) {
+  // messagesContainerEl.innerHTML = "";
+  messagesContainerEl.innerHTML = createNewmessage(currentId, message);
 }
 
 // enter keydown function
@@ -84,34 +113,34 @@ document.addEventListener("click", function (e) {
 
 // delete button
 function handleDeleteButton(targetKey) {
-  const targetMessage = messagesArray.filter(function (message) {
-    return targetKey == message.key;
+  const targetMessage = messagevalArray.filter(function (message) {
+    return message[0] == targetKey;
   })[0];
-  if (!targetMessage.isFav) {
-    let exactMessageIndex = messagesArray.indexOf(targetMessage);
-    messagesArray.splice(exactMessageIndex, 1);
-    render();
+  if (targetMessage[1].isFav == false) {
+    let deleteMessage = ref(database, `messages/${targetKey}`);
+    remove(deleteMessage);
   }
 }
 // fav button
 function handleFavButton(targetKey) {
-  const targetMessage = messagesArray.filter(function (message) {
-    return message.key == targetKey;
+  const targetMessage = messagevalArray.filter(function (message) {
+    return message[0] == targetKey;
   })[0];
-  targetMessage.isFav = !targetMessage.isFav;
-  render();
+
+  const messageRef = ref(database, "messages/" + targetKey);
+  update(messageRef, {
+    isFav: !targetMessage[1].isFav,
+  });
 }
 
 //delete all button
 
 deleteAllBtnEl.addEventListener("click", function () {
-  let targetMessages = messagesArray.filter(function (message) {
-    return message.isFav === false;
+  const targetMessagesArray = messagevalArray.filter(function (message) {
+    return message[1].isFav == false;
   });
-  targetMessages.forEach(function (message) {
-    let targetIndex = messagesArray.indexOf(message);
-    messagesArray.splice(targetIndex, 1);
+  targetMessagesArray.forEach(function (message) {
+    let deleteMessage = ref(database, `messages/${message[0]}`);
+    remove(deleteMessage);
   });
-  // console.log(targetMessages);
-  render();
 });
